@@ -6,7 +6,7 @@ import { ConfigSchema, DEFAULTS, type Config } from './config.js'
 import { PRESETS, type Zone } from './zones.js'
 import { targetNodes, type SensorTargetNode } from './targets.js'
 
-const PLUGIN_ID = 'signalk-collision-alerts'
+const PLUGIN_ID = 'collision-alerts'
 const NM = 1852
 const KNOT = 1852 / 3600
 

@@ -58,7 +58,7 @@ describe('plugin', () => {
     vi.advanceTimersByTime(2000)
     expect(notifications.raise).toHaveBeenCalledOnce()
     expect(handleMessage).toHaveBeenCalledWith(
-      'signalk-collision-alerts',
+      'collision-alerts',
       expect.objectContaining({ context: `vessels.${OTHER}` })
     )
     await plugin.stop()

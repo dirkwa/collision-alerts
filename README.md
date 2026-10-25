@@ -6,7 +6,7 @@ Warns you when another vessel is on course to pass too close. For every AIS targ
 
 Install **@signalk/collision-alerts** from the App Store.
 
-If you have the older `signalk-collision-alerts` package installed, uninstall it first: both are the same plugin, and your settings carry over. That package is no longer updated.
+If you have the older `signalk-collision-alerts` package installed, uninstall it: it is no longer updated, and running both raises every alarm twice. Settings do not carry over, so set the alert sensitivity again in the new plugin's settings.
 
 A new installation starts on its own with the Coastal sensitivity; an installation you disabled earlier stays off until you enable it in its settings. To change the sensitivity, pick an **Alert sensitivity** there:
 
