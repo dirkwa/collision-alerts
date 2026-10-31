@@ -59,4 +59,21 @@ describe('DriftDetector', () => {
     }
     expect(track?.cog).toBeCloseTo((3 * Math.PI) / 2, 2)
   })
+
+  it('leaves a boat swinging round its anchor stopped', () => {
+    // 90° round a 60 m rode over 8 minutes, then lying still: the boat moves
+    // 85 m the same way, along an arc.
+    const detector = new DriftDetector()
+    let track
+    for (let i = 0; i <= 12; i++) {
+      const a = (Math.min(i, 8) / 8) * (Math.PI / 2)
+      track = detector.apply('a', stopped(60 * Math.cos(a), 60 * Math.sin(a)), T0 + i * MINUTE)
+      expect(track.sog).toBe(0)
+    }
+  })
+
+  it('still finds a boat dragging in a straight line through position noise', () => {
+    const track = feed(new DriftDetector(), [0, 14, 21, 37, 44, 61, 66, 83])
+    expect(track?.sog).toBeGreaterThan(0)
+  })
 })

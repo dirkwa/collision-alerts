@@ -5,6 +5,11 @@ import type { LatLon, Track } from './cpa.js'
 // anchor or drifting free moves just as slowly, but its position keeps moving
 // the same way over minutes, while the noise of one lying still stays within
 // about 10 m. Its measured motion replaces the reported "stopped".
+//
+// A boat swinging at anchor also moves the same way for minutes, as far as
+// twice its scope, but along an arc round its anchor, while a dragging boat
+// moves in a straight line. Only movement long and straight enough to tell
+// the two apart counts as drift.
 
 /** How far back positions are kept, ms. AIS boats at anchor report every 3 min. */
 const WINDOW = 10 * 60_000
@@ -13,9 +18,11 @@ const SAMPLE_SPACING = 30_000
 /** The positions must span at least this long before drift is judged, ms. */
 const MIN_SPAN = 4 * 60_000
 /** Net movement over the window that counts as drifting, metres. */
-const MIN_DRIFT = 40
+const MIN_DRIFT = 60
 /** Both halves of the window must each cover this share of the net movement, so a boat that moved once and stopped, or swung out and back, is not drifting. */
 const STEADY_SHARE = 0.25
+/** No position may lie farther off the straight line from first to last than this share of the net movement. A 60° swing bows out by 0.13 of its chord, position noise by a few metres. */
+const MAX_BOW = 0.1
 
 const EARTH_RADIUS = 6371008.8
 const DEG = Math.PI / 180
@@ -96,7 +103,19 @@ function measure(samples: Sample[]): { sog: number; cog: number } | null {
   if (Math.min(firstHalf, secondHalf) < STEADY_SHARE * distance) {
     return null
   }
+  if (bow(samples, dx, dy, distance) > MAX_BOW * distance) {
+    return null
+  }
   return { sog: distance / (span / 1000), cog: (Math.atan2(dx, dy) + 2 * Math.PI) % (2 * Math.PI) }
+}
+
+/** Farthest any position lies off the line from the first along (dx, dy), metres. */
+function bow(samples: Sample[], dx: number, dy: number, distance: number): number {
+  const first = samples[0].position
+  return samples.reduce((most, s) => {
+    const [x, y] = offset(first, s.position)
+    return Math.max(most, Math.abs(x * dy - y * dx) / distance)
+  }, 0)
 }
 
 function closestInTime(samples: Sample[], time: number): Sample {

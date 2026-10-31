@@ -30,7 +30,7 @@ A boat slower than 0.5 kn counts as stopped: boats at anchor report a speed and 
 
 A boat that will pass behind you, more than about 105° off your bow at its closest point, raises nothing unless it will come inside the alarm distance, because a boat crossing your wake is not on a collision course. One that will come that close warns and alarms as usual.
 
-A boat that reports being stopped but keeps moving the same way, more than 40 m over a few minutes, is judged by its measured course and speed, so a neighbour dragging its anchor toward you raises the alarm. Your own boat is treated the same way. Position noise and a boat swinging back and forth at anchor don't count.
+A boat that reports being stopped but keeps moving the same way in a straight line, more than 60 m over a few minutes, is judged by its measured course and speed, so a neighbour dragging its anchor toward you raises the alarm. Your own boat is treated the same way. Position noise and a boat swinging at anchor, which moves along an arc, don't count.
 
 By default, at most three targets alarm at once (**Alarm for at most this many targets at once**, 1 to 5): the highest level first, then the soonest closest approach. The rest alarm as soon as they become one of the most urgent, so a crowded anchorage doesn't bury you in alarms.
 
