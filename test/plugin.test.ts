@@ -114,6 +114,29 @@ describe('plugin', () => {
   })
 })
 
+describe('plugin at anchor', () => {
+  beforeEach(() => vi.useFakeTimers())
+  afterEach(() => vi.useRealTimers())
+
+  it('does not take own ship swinging at anchor for drift towards a neighbour', async () => {
+    const { app, notifications } = fakeApp(true)
+    const start = Date.now()
+    // Own ship swings 60 m north at a steady 0.2 m/s over five minutes,
+    // reporting 0.4 kn; the neighbour 100 m north lies still.
+    vi.mocked(app.getSelfPath).mockImplementation(() =>
+      nav(50 + (Math.min(Date.now() - start, 300_000) * 0.0002) / 1852 / 60, 0, 0.2)
+    )
+    vi.mocked(app.getPath).mockImplementation((path: string): unknown =>
+      path === 'vessels' ? { [OTHER]: { navigation: nav(50 + 100 / 1852 / 60, 0, 0) } } : undefined
+    )
+    const plugin = createPlugin(app)
+    plugin.start({}, () => undefined)
+    vi.advanceTimersByTime(600_000)
+    expect(notifications.raise).not.toHaveBeenCalled()
+    await plugin.stop()
+  })
+})
+
 describe('plugin with sensor targets', () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => vi.useRealTimers())

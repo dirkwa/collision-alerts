@@ -26,11 +26,11 @@ If you used the CPA calculation in **SK Derived Data**, turn it off there so you
 
 While you and another boat are both slower than 3 kn (**Use Harbour limits when both boats are slower than**), that boat is judged by the Harbour limits, so the boats at anchor you motor past on arrival don't alarm. A boat that is stopped is judged by the Harbour limits at any speed of yours: it can only be hit by steering into it, so passing an anchorage half a mile off raises nothing, while heading straight for an anchored boat still does. A faster boat keeps your chosen limits, and so does one found dragging its anchor. Set it to 0 to turn this off.
 
-A boat slower than 0.5 kn counts as stopped: boats at anchor report a speed and course that are mostly noise, so two of them never alarm on each other. Anything actually moving towards you still does.
+A boat slower than 0.5 kn counts as stopped: boats at anchor report a speed and course that are mostly noise, so two of them never alarm on each other. Anything actually moving towards you still does. A boat that is stopped, your own included, counts as moving again only above 1 kn, since a boat yawing at anchor in gusts reports more than half a knot.
 
 A boat that will pass behind you, more than about 105° off your bow at its closest point, raises nothing unless it will come inside the alarm distance, because a boat crossing your wake is not on a collision course. One that will come that close warns and alarms as usual.
 
-A boat that reports being stopped but keeps moving the same way, more than 40 m over a few minutes, is judged by its measured course and speed, so a neighbour dragging its anchor toward you raises the alarm. Your own boat is treated the same way. Position noise and a boat swinging back and forth at anchor don't count.
+A boat that reports being stopped but keeps moving the same way, more than 40 m over a few minutes, is judged by its measured course and speed, so a neighbour dragging its anchor toward you raises the alarm. Position noise and a boat swinging back and forth at anchor don't count. Your own boat's drift is not measured: its GPS sees every swing at anchor, and your anchor alarm watches it dragging.
 
 By default, at most three targets alarm at once (**Alarm for at most this many targets at once**, 1 to 5): the highest level first, then the soonest closest approach. The rest alarm as soon as they become one of the most urgent, so a crowded anchorage doesn't bury you in alarms.
 

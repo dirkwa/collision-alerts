@@ -85,7 +85,15 @@ interface Candidate {
   target: Track
 }
 
-export function toTrack(node: VesselNode | undefined, nowMs: number, maxAge: number): Track | null {
+/**
+ * @param stoppedBelow speed (m/s) below which the vessel counts as stopped
+ */
+export function toTrack(
+  node: VesselNode | undefined,
+  nowMs: number,
+  maxAge: number,
+  stoppedBelow = STATIONARY_SPEED
+): Track | null {
   const nav = node?.navigation
   if (!nav?.position || !nav.speedOverGround) {
     return null
@@ -102,7 +110,7 @@ export function toTrack(node: VesselNode | undefined, nowMs: number, maxAge: num
     return null
   }
   const position = { latitude, longitude }
-  if (sog < STATIONARY_SPEED) {
+  if (sog < stoppedBelow) {
     return { position, sog: 0, cog: 0 }
   }
   const cog = nav.courseOverGroundTrue?.value
@@ -110,6 +118,32 @@ export function toTrack(node: VesselNode | undefined, nowMs: number, maxAge: num
     return null
   }
   return { position, sog, cog }
+}
+
+/**
+ * Own ship as the evaluator sees it. At anchor, own GPS reports the yaw and
+ * swing of the hull every second, in gusts often above half a knot with a
+ * course all round the compass, which would set own ship moving towards every
+ * neighbour in turn. Stopped, own ship needs the speed a stopped target needs
+ * before it counts as moving again. It starts out stopped: the server mostly
+ * starts with the boat in harbour or at anchor, and under way it is soon
+ * faster than that.
+ */
+export class OwnShip {
+  private stopped = true
+
+  track(node: VesselNode | undefined, nowMs: number, maxAge: number): Track | null {
+    const track = toTrack(
+      node,
+      nowMs,
+      maxAge,
+      this.stopped ? STOPPED_RELEASE_SPEED : STATIONARY_SPEED
+    )
+    if (track) {
+      this.stopped = track.sog === 0
+    }
+    return track
+  }
 }
 
 /** When the vessel's position was reported, ms since the epoch; NaN when unknown. */

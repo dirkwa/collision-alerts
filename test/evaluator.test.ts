@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import type { AlarmSink, CollisionAlert } from '../src/alarms.js'
-import { Evaluator, toTrack, type EvaluatorOptions, type VesselNode } from '../src/evaluator.js'
+import {
+  Evaluator,
+  OwnShip,
+  toTrack,
+  type EvaluatorOptions,
+  type VesselNode
+} from '../src/evaluator.js'
 import { PRESETS } from '../src/zones.js'
 import { defined } from './helpers.js'
 
@@ -69,6 +75,35 @@ describe('toTrack', () => {
     const v = vessel(50, 1, 0, 5)
     delete defined(v.navigation).courseOverGroundTrue
     expect(toTrack(v, NOW, 360)).toBeNull()
+  })
+})
+
+describe('OwnShip', () => {
+  it('stays stopped at anchor while gusts yaw the GPS speed up to 1 kn', () => {
+    const ownShip = new OwnShip()
+    expect(ownShip.track(vessel(50, 1, 40, 0.1), NOW, 360)).toMatchObject({ sog: 0 })
+    expect(ownShip.track(vessel(50, 1, 220, 0.45), NOW, 360)).toMatchObject({ sog: 0 })
+  })
+
+  it('starts out stopped, so a restart at anchor in a gust raises nothing', () => {
+    expect(new OwnShip().track(vessel(50, 1, 220, 0.45), NOW, 360)).toMatchObject({ sog: 0 })
+  })
+
+  it('moves once faster than 1 kn, and stops again below 0.5 kn', () => {
+    const ownShip = new OwnShip()
+    expect(ownShip.track(vessel(50, 1, 90, 0.6), NOW, 360)).toMatchObject({ sog: 0.6 })
+    expect(ownShip.track(vessel(50, 1, 90, 0.45), NOW, 360)).toMatchObject({ sog: 0.45 })
+    expect(ownShip.track(vessel(50, 1, 90, 0.2), NOW, 360)).toMatchObject({ sog: 0 })
+  })
+
+  it('does not alarm for a neighbour at anchor while own GPS speed is gust noise', () => {
+    const { sink, ev } = setup({ zones: PRESETS.harbour })
+    const ownShip = new OwnShip()
+    // 60 m north; own GPS reports 0.9 kn straight at it.
+    const neighbour = { [OTHER]: vessel(50 + 60 / 1852 / 60, 1, 0, 0.05) }
+    ev.evaluate(ownShip.track(vessel(50, 1, 0, 0.2), NOW, 360), neighbour, SELF, NOW)
+    ev.evaluate(ownShip.track(vessel(50, 1, 0, 0.45), NOW, 360), neighbour, SELF, NOW)
+    expect(sink.calls).toHaveLength(0)
   })
 })
 
