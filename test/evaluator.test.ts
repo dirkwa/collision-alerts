@@ -450,6 +450,15 @@ describe('Evaluator', () => {
       const wider = setup({ slowSpeed: 1.5 })
       wider.ev.evaluate(own, { [OTHER]: sameCourse(100, 60) }, SELF, NOW)
       expect(wider.sink.calls).toEqual([])
+      // Just inside both limits, CPA 48 m in 118 s; just outside each.
+      const at = (northM: number, eastM: number) => {
+        const { sink, ev } = setup({ slowSpeed: 1.5 })
+        ev.evaluate(own, { [OTHER]: sameCourse(northM, eastM) }, SELF, NOW)
+        return levels(sink)
+      }
+      expect(at(118, 48)).toEqual(['alarm'])
+      expect(at(122, 48)).toEqual([])
+      expect(at(118, 52)).toEqual([])
     })
 
     it('does not count time passing wide astern', () => {
