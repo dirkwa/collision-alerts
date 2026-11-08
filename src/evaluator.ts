@@ -267,6 +267,9 @@ export class Evaluator {
   }
 
   /**
+   * Judges every target against own ship, raises, updates or clears its alarm
+   * through the sink, and returns each target's CPA to publish.
+   *
    * @param own own ship, or null when its own data is missing/stale
    * @param vessels AIS vessels and sensor targets, keyed by id
    */
