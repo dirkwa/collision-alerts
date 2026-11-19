@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.eslint.json",
     "test": "vitest run",
     "build:all": "npm run ci-lint && npm run typecheck && npm run build && npm run test",
+    "replay": "jiti scripts/replay.ts",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
